@@ -1,7 +1,5 @@
 from utils import sumar, obtener_usuario
-from auth import login, generar_token
-from db import ejecutar_query
-import os
+from auth import generar_token
 
 def main():
     usuario = obtener_usuario(1)
