@@ -1,12 +1,12 @@
-from utils import sumar, obtener_usuario
-from auth import login, generar_token
-from db import ejecutar_query
 import os
+from utils import sumar, obtener_usuario
+from auth import generar_token
 
 def main():
     usuario = obtener_usuario(1)
     total = sumar(5, 10, 15)
-    token = generar_token('admin')
+    role = os.getenv('APP_ROLE', 'guest')
+    token = generar_token(role)
     print(f'Token: {token}')
     print(f'Usuario: {usuario}')
     print(f'Total: {total}')
