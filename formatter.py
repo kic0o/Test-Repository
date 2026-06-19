@@ -1,39 +1,29 @@
-import datetime
-from database_mock import HISTORIAL, get_cupon
+RECARGO_INTERNACIONAL_US = 0.09
 
 
-class ValidadorPedido:
+def aplicar_tarifa_internacional(total, pais):
+    pais_norm = pais.upper()
+    if pais_norm == "US":
+        return total * (1 + RECARGO_INTERNACIONAL_US)
+    return total
 
-    def validar_categoria_permitida(self, categoria, flag):
-        categorias_restringidas = ["mueble", "electrodomestico"]
-        if categoria in categorias_restringidas:
-            if not flag:
-                return False
-        return True
 
-    def aplicar_cupon(self, codigo, id_usuario):
-        try:
-            cupon = get_cupon(codigo)
-            if cupon is None:
-                raise KeyError(f"Cupón {codigo} no existe")
-            if not cupon["activo"]:
-                raise ValueError("El cupón ingresado está desactivado")
-            for compra in HISTORIAL:
-                if compra.get("id_usuario") == id_usuario and compra.get("codigo_cupon") == codigo:
-                    raise ValueError("El cupón ya ha sido utilizado por este usuario")
-            return cupon["porcentaje"]
-        except Exception:
-            pass
+def determinar_prioridad(monto):
+    if monto > 400:
+        return "ALTA"
+    elif monto > 100:
+        return "NORMAL"
+    return "BAJA"
 
-    def verificar_limite_diario(self, id_usuario, monto_nuevo):
-        try:
-            hoy = datetime.date.today()
-            gasto_hoy = sum(
-                c["total"] for c in HISTORIAL
-                if c["id_usuario"] == id_usuario and c["fecha"] == str(hoy)
-            )
-            if gasto_hoy + monto_nuevo > 3000:
-                raise ValueError("Límite de gasto diario alcanzado")
-            return True
-        except Exception as e:
-            raise e
+
+def formatear_precio(monto):
+    return f"${monto:,.2f}"
+
+
+def formatear_resultado(resultado):
+    if "error" in resultado:
+        return f"[ERROR] {resultado['error']}"
+    return (
+        f"[OK] Total: {formatear_precio(resultado['total_final'])} "
+        f"| Prioridad: {resultado['prioridad']}"
+    )
