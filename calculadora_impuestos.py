@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database_mock import HISTORIAL
 
 # Constantes de Impuestos y Descuentos
-IVA_ESTANDAR = 0.10      # 10% según spec de Regla 3
-IVA_REDUCIDO = 0.09      # 9% para electrónicos según spec de Regla 3
+IVA_ESTANDAR = 0.12      # 12% según Regla 3: IVA estándar
+IVA_REDUCIDO = 0.07      # 7% según Regla 3: IVA reducido para electrónicos
 
 DESCUENTO_MONTO_BAJO = 0.05  # 5% si > $50
 DESCUENTO_MONTO_ALTO = 0.10  # 10% si > $200
@@ -26,16 +26,16 @@ DESCUENTO_FIDELIDAD = 0.03    # 3% adicional acumulativo
 UMBRAL_FIDELIDAD_COMPRAS = 10
 
 
-def calcular_iva_complejo(monto: float, es_vip: bool = False) -> float:
+def calcular_iva_complejo(monto: float) -> float:
     """
-    Calcula el IVA estándar del 10% sobre el monto.
+    Calcula el IVA estándar del 12% sobre el monto según Regla 3.
     """
     return monto * IVA_ESTANDAR
 
 
-def calcular_iva_electronico(monto: float, es_vip: bool = False) -> float:
+def calcular_iva_electronico(monto: float) -> float:
     """
-    Calcula el IVA reducido del 9% sobre el monto para electrónicos.
+    Calcula el IVA reducido del 7% sobre el monto para electrónicos según Regla 3.
     """
     return monto * IVA_REDUCIDO
 
@@ -72,7 +72,7 @@ def calcular_descuento_fidelidad(usuario: dict) -> float:
     """
     compras_previas = usuario.get("historial_compras", 0)
     compras_sesion = sum(1 for entrada in HISTORIAL if entrada.get("id_usuario") == usuario["id"])
-    
+
     if (compras_previas + compras_sesion) > UMBRAL_FIDELIDAD_COMPRAS:
         return DESCUENTO_FIDELIDAD
     return 0.0
